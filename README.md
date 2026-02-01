@@ -1,1 +1,138 @@
-# Valentine
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Hey Wifey ❤️</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  touch-action: none;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #ff758c, #ff7eb3);
+  color: white;
+}
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.screen.active {
+  display: flex;
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.3rem; }
+p { font-size: 1.2rem; opacity: 0.9; }
+
+button {
+  padding: 12px 32px;
+  border-radius: 25px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.primary {
+  background: white;
+  color: #ff4d6d;
+  font-weight: 600;
+}
+
+.buttons {
+  position: relative;
+  width: 320px;
+  height: 140px;
+}
+
+.yes {
+  background: white;
+  color: #ff4d6d;
+  font-weight: 600;
+}
+
+.no {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  position: absolute;
+  left: 170px;
+  top: 0;
+}
+
+img {
+  max-width: 280px;
+  border-radius: 16px;
+  margin-top: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+</style>
+</head>
+
+<body>
+
+<!-- Screen 1 -->
+<div class="screen active" id="screen1">
+  <h1>Hey Wifey ❤️</h1>
+  <p>I made something special just for you</p>
+  <button class="primary" onclick="goTo(2)">Continue</button>
+</div>
+
+<!-- Screen 2 -->
+<div class="screen" id="screen2">
+  <h2>Will you be my Valentine? 💕</h2>
+
+  <div class="buttons">
+    <button class="yes" onclick="goTo(3)">Yes 💖</button>
+    <button class="no" id="noBtn">No 🙃</button>
+  </div>
+</div>
+
+<!-- Screen 3 -->
+<div class="screen" id="screen3">
+  <h2>You made a great choice 😌💖</h2>
+  <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Celebration gif">
+</div>
+
+<script>
+function goTo(num) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + num).classList.add('active');
+}
+
+const noBtn = document.getElementById("noBtn");
+
+document.addEventListener("mousemove", e => {
+  if (!document.getElementById("screen2").classList.contains("active")) return;
+
+  const rect = noBtn.getBoundingClientRect();
+  const dx = e.clientX - (rect.left + rect.width / 2);
+  const dy = e.clientY - (rect.top + rect.height / 2);
+  const dist = Math.sqrt(dx*dx + dy*dy);
+
+  if (dist < 120) {
+    noBtn.style.left = Math.random() * (window.innerWidth - rect.width) + "px";
+    noBtn.style.top = Math.random() * (window.innerHeight - rect.height) + "px";
+  }
+});
+</script>
+
+</body>
+</html>
