@@ -73,13 +73,23 @@ button:hover { transform: scale(1.05); }
   right: 0;
   top: 0;
   z-index: 1;
+  transition: left 0.2s ease, top 0.2s ease;
 }
 
-img {
-  max-width: 280px;
+#gif {
+  max-width: 80%;
   border-radius: 16px;
-  margin-top: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  z-index: 2;
+  position: relative;
+}
+
+.confetti, .heart {
+  position: fixed;
+  pointer-events: none;
+  z-index: 10;
+  font-size: 24px;
+  user-select: none;
 }
 </style>
 </head>
@@ -97,7 +107,7 @@ img {
 <div class="screen" id="screen2">
   <h2>Will you be my Valentine? 💕</h2>
   <div class="buttons">
-    <button class="yes" onclick="goTo(3)">Yes 💖</button>
+    <button class="yes" onclick="goTo(3); startCelebration()">Yes 💖</button>
     <button class="no" id="noBtn">No 🙃</button>
   </div>
 </div>
@@ -105,7 +115,7 @@ img {
 <!-- Screen 3 -->
 <div class="screen" id="screen3">
   <h2>You made a great choice 😌💖</h2>
-  <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Celebration gif">
+  <img id="gif" src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Celebration gif">
 </div>
 
 <script>
@@ -115,7 +125,7 @@ function goTo(num) {
   document.getElementById('screen' + num).classList.add('active');
 }
 
-// NO button logic
+// Smooth NO button nudge
 const noBtn = document.getElementById("noBtn");
 
 document.addEventListener("mousemove", e => {
@@ -128,13 +138,71 @@ document.addEventListener("mousemove", e => {
   const distance = Math.sqrt(dx*dx + dy*dy);
 
   if (distance < 120) {
-    // Move NO away, but stay inside viewport
-    const newLeft = Math.min(window.innerWidth - rect.width, Math.max(0, rect.left - dx*0.8));
-    const newTop = Math.min(window.innerHeight - rect.height, Math.max(0, rect.top - dy*0.8));
+    const moveX = -dx / distance * 16; // small nudge
+    const moveY = -dy / distance * 16;
+
+    let newLeft = rect.left + moveX;
+    let newTop = rect.top + moveY;
+
+    newLeft = Math.min(window.innerWidth - rect.width, Math.max(0, newLeft));
+    newTop = Math.min(window.innerHeight - rect.height, Math.max(0, newTop));
+
     noBtn.style.left = newLeft + "px";
     noBtn.style.top = newTop + "px";
   }
 });
+
+// Celebration
+function startCelebration() {
+  createConfetti(150);
+  createHearts(50);
+}
+
+// Confetti explosion
+function createConfetti(count) {
+  for (let i=0;i<count;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.innerText = '🎉';
+    c.style.left = Math.random() * window.innerWidth + 'px';
+    c.style.top = '-50px';
+    c.style.fontSize = (16 + Math.random()*24) + 'px';
+    c.style.opacity = Math.random();
+    document.body.appendChild(c);
+
+    const fall = () => {
+      let top = parseFloat(c.style.top);
+      if(top > window.innerHeight + 50){ c.remove(); return; }
+      c.style.top = (top + 4 + Math.random()*3) + 'px';
+      c.style.left = (parseFloat(c.style.left) + Math.sin(top/20)*2) + 'px';
+      requestAnimationFrame(fall);
+    };
+    fall();
+  }
+}
+
+// Floating hearts
+function createHearts(count){
+  for (let i=0;i<count;i++){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.innerText = '❤️';
+    h.style.left = Math.random()*window.innerWidth+'px';
+    h.style.top = window.innerHeight+'px';
+    h.style.fontSize = (12+Math.random()*24)+'px';
+    h.style.opacity = Math.random();
+    document.body.appendChild(h);
+
+    const floatUp = () => {
+      let top = parseFloat(h.style.top);
+      if(top < -50){ h.remove(); return; }
+      h.style.top = (top - (1+Math.random()*2)) + 'px';
+      h.style.left = (parseFloat(h.style.left) + Math.sin(top/50)) + 'px';
+      requestAnimationFrame(floatUp);
+    };
+    floatUp();
+  }
+}
 </script>
 
 </body>
