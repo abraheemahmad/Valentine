@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Hey Wifey ❤️</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -15,9 +14,6 @@ html, body {
   overflow: hidden;
   touch-action: none;
   font-family: 'Poppins', sans-serif;
-}
-
-body {
   background: linear-gradient(135deg, #ff758c, #ff7eb3);
   color: white;
 }
@@ -34,9 +30,7 @@ body {
   padding: 20px;
 }
 
-.screen.active {
-  display: flex;
-}
+.screen.active { display: flex; }
 
 h1 { font-size: 3rem; }
 h2 { font-size: 2.3rem; }
@@ -48,24 +42,27 @@ button {
   border: none;
   font-size: 1rem;
   cursor: pointer;
+  transition: transform 0.15s ease;
 }
 
-.primary {
-  background: white;
-  color: #ff4d6d;
-  font-weight: 600;
-}
+button:hover { transform: scale(1.05); }
+
+.primary { background: white; color: #ff4d6d; font-weight: 600; }
 
 .buttons {
   position: relative;
   width: 320px;
   height: 140px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .yes {
   background: white;
   color: #ff4d6d;
   font-weight: 600;
+  z-index: 2;
 }
 
 .no {
@@ -73,8 +70,9 @@ button {
   border: 2px solid white;
   color: white;
   position: absolute;
-  left: 170px;
+  right: 0;
   top: 0;
+  z-index: 1;
 }
 
 img {
@@ -98,7 +96,6 @@ img {
 <!-- Screen 2 -->
 <div class="screen" id="screen2">
   <h2>Will you be my Valentine? 💕</h2>
-
   <div class="buttons">
     <button class="yes" onclick="goTo(3)">Yes 💖</button>
     <button class="no" id="noBtn">No 🙃</button>
@@ -112,24 +109,30 @@ img {
 </div>
 
 <script>
+// Screen switching
 function goTo(num) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen' + num).classList.add('active');
 }
 
+// NO button logic
 const noBtn = document.getElementById("noBtn");
 
 document.addEventListener("mousemove", e => {
-  if (!document.getElementById("screen2").classList.contains("active")) return;
+  const screen2 = document.getElementById("screen2");
+  if (!screen2.classList.contains("active")) return;
 
   const rect = noBtn.getBoundingClientRect();
   const dx = e.clientX - (rect.left + rect.width / 2);
   const dy = e.clientY - (rect.top + rect.height / 2);
-  const dist = Math.sqrt(dx*dx + dy*dy);
+  const distance = Math.sqrt(dx*dx + dy*dy);
 
-  if (dist < 120) {
-    noBtn.style.left = Math.random() * (window.innerWidth - rect.width) + "px";
-    noBtn.style.top = Math.random() * (window.innerHeight - rect.height) + "px";
+  if (distance < 120) {
+    // Move NO away, but stay inside viewport
+    const newLeft = Math.min(window.innerWidth - rect.width, Math.max(0, rect.left - dx*0.8));
+    const newTop = Math.min(window.innerHeight - rect.height, Math.max(0, rect.top - dy*0.8));
+    noBtn.style.left = newLeft + "px";
+    noBtn.style.top = newTop + "px";
   }
 });
 </script>
