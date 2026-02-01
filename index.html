@@ -26,7 +26,7 @@ html, body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  gap: 25px;
+  gap: 20px;
   padding: 20px;
 }
 
@@ -55,6 +55,7 @@ button:hover { transform: scale(1.05); }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 10px;
 }
 
 .yes {
@@ -70,7 +71,7 @@ button:hover { transform: scale(1.05); }
   color: white;
   position: absolute;
   z-index: 1;
-  transition: left 0.3s ease, top 0.3s ease;
+  transition: left 0.3s ease, top 0.3s ease; /* smooth movement */
 }
 
 #gif {
@@ -80,6 +81,12 @@ button:hover { transform: scale(1.05); }
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   z-index: 2;
   position: relative;
+}
+
+#puss {
+  width: 180px;
+  max-width: 30%;
+  margin-bottom: 10px;
 }
 
 .confetti, .heart {
@@ -110,6 +117,7 @@ button:hover { transform: scale(1.05); }
 <!-- Screen 2 -->
 <div class="screen" id="screen2">
   <h2>Will you be my Valentine?</h2>
+  <img id="puss" src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Puss in Boots crying">
   <div class="buttons">
     <button class="yes" onclick="goTo(3); startCelebration()">Yes</button>
     <button class="no" id="noBtn">No</button>
@@ -166,7 +174,7 @@ function startCelebration() {
   createHearts(70);
 }
 
-// Confetti
+// Full-screen confetti
 function createConfetti(count) {
   for (let i=0;i<count;i++){
     const c = document.createElement('div');
@@ -189,7 +197,7 @@ function createConfetti(count) {
   }
 }
 
-// Hearts
+// Floating hearts
 function createHearts(count){
   for (let i=0;i<count;i++){
     const h = document.createElement('div');
