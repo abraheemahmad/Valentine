@@ -12,7 +12,6 @@ html, body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  touch-action: none;
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #ff758c, #ff7eb3);
   color: white;
@@ -25,7 +24,6 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
   gap: 20px;
   padding: 20px;
 }
@@ -49,13 +47,13 @@ button:hover { transform: scale(1.05); }
 .primary { background: white; color: #ff4d6d; font-weight: 600; }
 
 .buttons {
-  position: relative;
-  width: 400px;
-  height: 160px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  width: 320px;
   margin-top: 10px;
+  position: relative;
+  height: 60px;
+  align-items: center;
 }
 
 .yes {
@@ -69,9 +67,15 @@ button:hover { transform: scale(1.05); }
   background: transparent;
   border: 2px solid white;
   color: white;
+  z-index: 1;
   position: absolute;
-  z-index: 2;
   transition: left 0.3s ease, top 0.3s ease;
+}
+
+#puss {
+  width: 180px;
+  max-width: 30%;
+  margin-bottom: 10px;
 }
 
 #gif {
@@ -80,14 +84,13 @@ button:hover { transform: scale(1.05); }
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   z-index: 2;
-  position: relative;
 }
 
-#puss {
-  width: 180px;
-  max-width: 30%;
-  margin-bottom: 10px;
-  z-index: 1;
+#love {
+  font-size: 2.5rem;
+  margin-top: 20px;
+  font-weight: 600;
+  color: #fff0f5;
 }
 
 .confetti, .heart {
@@ -96,13 +99,6 @@ button:hover { transform: scale(1.05); }
   z-index: 10;
   font-size: 24px;
   user-select: none;
-}
-
-#love {
-  font-size: 2.5rem;
-  margin-top: 20px;
-  font-weight: 600;
-  color: #fff0f5;
 }
 </style>
 </head>
@@ -118,9 +114,10 @@ button:hover { transform: scale(1.05); }
 <!-- Screen 2 -->
 <div class="screen" id="screen2">
   <h2>Will you be my Valentine?</h2>
-  <img id="puss" src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Puss in Boots crying">
+  <!-- Puss in Boots crying GIF -->
+  <img id="puss" src="https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif" alt="Puss in Boots crying">
   <div class="buttons">
-    <button class="yes" onclick="goTo(3); startCelebration()">Yes</button>
+    <button class="yes" id="yesBtn" onclick="goTo(3); startCelebration()">Yes</button>
     <button class="no" id="noBtn">No</button>
   </div>
 </div>
@@ -139,19 +136,20 @@ function goTo(num) {
   document.getElementById('screen' + num).classList.add('active');
 }
 
-// Track NO button position
+// Smooth NO button logic
 const noBtn = document.getElementById("noBtn");
-// Start at bottom-right of buttons container
+const yesBtn = document.getElementById("yesBtn");
+
+// Start NO on the right side of the buttons container
 const buttonsContainer = noBtn.parentElement;
 const containerRect = buttonsContainer.getBoundingClientRect();
 let noPos = { 
-  left: containerRect.left + containerRect.width - noBtn.offsetWidth, 
+  left: containerRect.right - noBtn.offsetWidth, 
   top: containerRect.top + (containerRect.height - noBtn.offsetHeight)/2
 }; 
 noBtn.style.left = noPos.left + "px";
 noBtn.style.top = noPos.top + "px";
 
-// Smooth hover NO
 document.addEventListener("mousemove", e => {
   const screen2 = document.getElementById("screen2");
   if (!screen2.classList.contains("active")) return;
@@ -164,7 +162,7 @@ document.addEventListener("mousemove", e => {
   const distance = Math.sqrt(dx*dx + dy*dy);
 
   if (distance < 120) {
-    const moveX = -dx / distance * 16; // ~1 inch
+    const moveX = -dx / distance * 16; // small smooth nudge
     const moveY = -dy / distance * 16;
 
     noPos.left = Math.min(window.innerWidth - rect.width, Math.max(0, noPos.left + moveX));
@@ -181,12 +179,12 @@ function startCelebration() {
   createHearts(70);
 }
 
-// Full-screen confetti
+// Confetti
 function createConfetti(count) {
   for (let i=0;i<count;i++){
     const c = document.createElement('div');
-    c.className = 'heart';
-    c.innerText = '❤️';
+    c.className = 'confetti';
+    c.innerText = '🎉';
     c.style.left = Math.random() * window.innerWidth + 'px';
     c.style.top = '-50px';
     c.style.fontSize = (20 + Math.random()*30) + 'px';
