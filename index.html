@@ -70,8 +70,8 @@ button:hover { transform: scale(1.05); }
   border: 2px solid white;
   color: white;
   position: absolute;
-  z-index: 1;
-  transition: left 0.3s ease, top 0.3s ease; /* smooth movement */
+  z-index: 2;
+  transition: left 0.3s ease, top 0.3s ease;
 }
 
 #gif {
@@ -87,6 +87,7 @@ button:hover { transform: scale(1.05); }
   width: 180px;
   max-width: 30%;
   margin-bottom: 10px;
+  z-index: 1;
 }
 
 .confetti, .heart {
@@ -140,7 +141,13 @@ function goTo(num) {
 
 // Track NO button position
 const noBtn = document.getElementById("noBtn");
-let noPos = { left: window.innerWidth - 80, top: 0 }; 
+// Start at bottom-right of buttons container
+const buttonsContainer = noBtn.parentElement;
+const containerRect = buttonsContainer.getBoundingClientRect();
+let noPos = { 
+  left: containerRect.left + containerRect.width - noBtn.offsetWidth, 
+  top: containerRect.top + (containerRect.height - noBtn.offsetHeight)/2
+}; 
 noBtn.style.left = noPos.left + "px";
 noBtn.style.top = noPos.top + "px";
 
@@ -157,7 +164,7 @@ document.addEventListener("mousemove", e => {
   const distance = Math.sqrt(dx*dx + dy*dy);
 
   if (distance < 120) {
-    const moveX = -dx / distance * 16;
+    const moveX = -dx / distance * 16; // ~1 inch
     const moveY = -dy / distance * 16;
 
     noPos.left = Math.min(window.innerWidth - rect.width, Math.max(0, noPos.left + moveX));
@@ -178,8 +185,8 @@ function startCelebration() {
 function createConfetti(count) {
   for (let i=0;i<count;i++){
     const c = document.createElement('div');
-    c.className = 'confetti';
-    c.innerText = '🎉';
+    c.className = 'heart';
+    c.innerText = '❤️';
     c.style.left = Math.random() * window.innerWidth + 'px';
     c.style.top = '-50px';
     c.style.fontSize = (20 + Math.random()*30) + 'px';
@@ -197,7 +204,7 @@ function createConfetti(count) {
   }
 }
 
-// Floating hearts
+// Hearts
 function createHearts(count){
   for (let i=0;i<count;i++){
     const h = document.createElement('div');
