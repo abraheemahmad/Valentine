@@ -1,60 +1,171 @@
-<script>
-// Track mouse
-let mouse = {x:0, y:0};
-document.addEventListener("mousemove", e => {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hey Wifey</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+html, body {
+  width: 100%; height: 100%; margin: 0;
+  overflow: hidden; font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ff758c, #ff7eb3); color: white;
+}
 
-// Track NO button position
+.screen {
+  position: fixed; inset: 0; display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 20px; padding: 20px;
+}
+.screen.active { display: flex; }
+
+h1 { font-size: 4rem; }
+h2 { font-size: 3rem; }
+
+button {
+  padding: 14px 36px; border-radius: 25px; border: none;
+  font-size: 1.2rem; cursor: pointer; transition: transform 0.15s ease;
+}
+button:hover { transform: scale(1.05); }
+
+.primary { background: white; color: #ff4d6d; font-weight: 600; }
+
+.buttons {
+  display: flex; justify-content: space-between;
+  width: 320px; margin-top: 10px; position: relative; height: 60px; align-items: center;
+}
+
+.yes { background: white; color: #ff4d6d; font-weight: 600; z-index: 2; }
+.no { background: transparent; border: 2px solid white; color: white;
+  position: absolute; z-index: 2; transition: left 0.3s ease, top 0.3s ease;
+}
+
+#puss { width: 180px; max-width: 30%; margin-bottom: 10px; z-index:1; }
+#gif { width: 90%; max-width: 700px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index:2; }
+#love { font-size: 2.5rem; margin-top: 20px; font-weight: 600; color: #fff0f5; }
+
+.confetti, .heart { position: fixed; pointer-events: none; z-index: 10; font-size: 24px; user-select: none; }
+</style>
+</head>
+
+<body>
+
+<!-- Screen 1 -->
+<div class="screen active" id="screen1">
+  <h1>Hey Wifey</h1>
+  <button class="primary" onclick="goTo(2)">Continue</button>
+</div>
+
+<!-- Screen 2 -->
+<div class="screen" id="screen2">
+  <h2>Will you be my Valentine?</h2>
+  <img id="puss" src="https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif" alt="Puss in Boots crying">
+  <div class="buttons">
+    <button class="yes" id="yesBtn" onclick="goTo(3); startCelebration()">Yes</button>
+    <button class="no" id="noBtn">No</button>
+  </div>
+</div>
+
+<!-- Screen 3 -->
+<div class="screen" id="screen3">
+  <h2>You made a great choice</h2>
+  <img id="gif" src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Celebration gif">
+  <div id="love">I love you</div>
+</div>
+
+<script>
+// Screen switching
+function goTo(num) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen'+num).classList.add('active');
+
+  // Reset NO button when entering screen2
+  if(num===2) resetNoButtonPosition();
+}
+
+// Smooth magnet NO button
 const noBtn = document.getElementById("noBtn");
 const buttonsContainer = noBtn.parentElement;
-let noPos = {
-  x: 0,
-  y: 0
-};
+let noPos = { x: 0, y: 0 };
+let mouse = {x:0, y:0};
 
-function resetNoButtonPosition() {
+document.addEventListener("mousemove", e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+
+function resetNoButtonPosition(){
   const rect = buttonsContainer.getBoundingClientRect();
   noPos.x = rect.right - noBtn.offsetWidth;
   noPos.y = rect.top + (rect.height - noBtn.offsetHeight)/2;
-  noBtn.style.left = noPos.x + "px";
-  noBtn.style.top = noPos.y + "px";
+  noBtn.style.left=noPos.x+"px";
+  noBtn.style.top=noPos.y+"px";
 }
 
-// Call reset on entering screen 2
-document.getElementById("screen2").addEventListener("transitionend", resetNoButtonPosition);
-
-// Smooth "magnet" movement
-function moveNoButton() {
+function moveNoButton(){
   const screen2 = document.getElementById("screen2");
-  if (!screen2.classList.contains("active")) {
-    requestAnimationFrame(moveNoButton);
-    return; // only move when screen2 active
+  if(screen2.classList.contains("active")){
+    const rect = noBtn.getBoundingClientRect();
+    const centerX = rect.left + rect.width/2;
+    const centerY = rect.top + rect.height/2;
+    const dx = mouse.x - centerX;
+    const dy = mouse.y - centerY;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    if(distance<120){
+      noPos.x -= dx/distance*8;
+      noPos.y -= dy/distance*8;
+      // Keep in viewport
+      noPos.x = Math.min(window.innerWidth - rect.width, Math.max(0, noPos.x));
+      noPos.y = Math.min(window.innerHeight - rect.height, Math.max(0, noPos.y));
+      noBtn.style.left = noPos.x+"px";
+      noBtn.style.top = noPos.y+"px";
+    }
   }
-
-  const rect = noBtn.getBoundingClientRect();
-  const centerX = rect.left + rect.width/2;
-  const centerY = rect.top + rect.height/2;
-  const dx = mouse.x - centerX;
-  const dy = mouse.y - centerY;
-  const distance = Math.sqrt(dx*dx + dy*dy);
-
-  if(distance < 120) {
-    // smooth magnet nudge
-    noPos.x -= dx / distance * 8;
-    noPos.y -= dy / distance * 8;
-
-    // keep in viewport
-    noPos.x = Math.min(window.innerWidth - rect.width, Math.max(0, noPos.x));
-    noPos.y = Math.min(window.innerHeight - rect.height, Math.max(0, noPos.y));
-
-    noBtn.style.left = noPos.x + "px";
-    noBtn.style.top = noPos.y + "px";
-  }
-
   requestAnimationFrame(moveNoButton);
 }
-
 requestAnimationFrame(moveNoButton);
+
+// Celebration
+function startCelebration(){
+  createConfetti(200);
+  createHearts(70);
+}
+
+// Confetti
+function createConfetti(count){
+  for(let i=0;i<count;i++){
+    const c=document.createElement('div'); c.className='confetti'; c.innerText='🎉';
+    c.style.left=Math.random()*window.innerWidth+'px';
+    c.style.top='-50px';
+    c.style.fontSize=(20+Math.random()*30)+'px';
+    c.style.opacity=Math.random();
+    document.body.appendChild(c);
+    const fall=()=>{
+      let top=parseFloat(c.style.top);
+      if(top>window.innerHeight+50){c.remove();return;}
+      c.style.top=(top+5+Math.random()*3)+'px';
+      c.style.left=(parseFloat(c.style.left)+Math.sin(top/20)*2)+'px';
+      requestAnimationFrame(fall);
+    }; fall();
+  }
+}
+
+// Hearts
+function createHearts(count){
+  for(let i=0;i<count;i++){
+    const h=document.createElement('div'); h.className='heart'; h.innerText='❤️';
+    h.style.left=Math.random()*window.innerWidth+'px';
+    h.style.top=window.innerHeight+'px';
+    h.style.fontSize=(18+Math.random()*24)+'px';
+    h.style.opacity=Math.random();
+    document.body.appendChild(h);
+    const floatUp=()=>{
+      let top=parseFloat(h.style.top);
+      if(top<-50){h.remove();return;}
+      h.style.top=(top-(1+Math.random()*2))+'px';
+      h.style.left=(parseFloat(h.style.left)+Math.sin(top/50))+'px';
+      requestAnimationFrame(floatUp);
+    }; floatUp();
+  }
+}
 </script>
+
+</body>
+</html>
