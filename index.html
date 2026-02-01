@@ -12,6 +12,7 @@
     height: 100vh;
     font-family: sans-serif;
     position: relative;
+    overflow: hidden;
   }
   button {
     padding: 15px 30px;
@@ -21,8 +22,11 @@
   }
   #no {
     position: absolute;
-    pointer-events: none; /* Makes it unclickable */
-    transition: transform 0.1s;
+    pointer-events: none; /* unclickable */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 0.05s linear, top 0.05s linear;
   }
 </style>
 </head>
@@ -32,20 +36,43 @@
 <button id="no">No</button>
 
 <script>
-  const noBtn = document.getElementById('no');
+const noBtn = document.getElementById('no');
+const distance = 100; // pixels (~1 inch)
 
-  document.addEventListener('mousemove', (e) => {
-    const distance = 100; // distance in pixels (~1 inch)
-    
-    // Random angle to move the No button away
-    const angle = Math.random() * 2 * Math.PI;
+document.addEventListener('mousemove', (e) => {
+  const cursorX = e.clientX;
+  const cursorY = e.clientY;
 
-    // Calculate new position
-    const newX = e.clientX + distance * Math.cos(angle);
-    const newY = e.clientY + distance * Math.sin(angle);
+  // Current position of No button
+  const rect = noBtn.getBoundingClientRect();
+  let noX = rect.left + rect.width / 2;
+  let noY = rect.top + rect.height / 2;
 
-    noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
-  });
+  // Vector from cursor to button
+  let dx = noX - cursorX;
+  let dy = noY - cursorY;
+  const len = Math.sqrt(dx*dx + dy*dy);
+
+  // If cursor is closer than desired distance, push it away
+  if(len < distance){
+    // Normalize vector
+    dx = dx / len;
+    dy = dy / len;
+
+    // New position at "distance" away
+    noX = cursorX + dx * distance;
+    noY = cursorY + dy * distance;
+
+    // Keep button inside window bounds
+    const btnWidth = rect.width;
+    const btnHeight = rect.height;
+    noX = Math.min(window.innerWidth - btnWidth/2, Math.max(btnWidth/2, noX));
+    noY = Math.min(window.innerHeight - btnHeight/2, Math.max(btnHeight/2, noY));
+
+    noBtn.style.left = `${noX}px`;
+    noBtn.style.top = `${noY}px`;
+  }
+});
 </script>
 
 </body>
