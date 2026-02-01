@@ -69,10 +69,8 @@ button:hover { transform: scale(1.05); }
   border: 2px solid white;
   color: white;
   position: absolute;
-  right: 0;
-  top: 0;
   z-index: 1;
-  transition: left 0.3s ease, top 0.3s ease; /* smooth movement */
+  transition: left 0.3s ease, top 0.3s ease;
 }
 
 #gif {
@@ -90,6 +88,13 @@ button:hover { transform: scale(1.05); }
   z-index: 10;
   font-size: 24px;
   user-select: none;
+}
+
+#love {
+  font-size: 2.5rem;
+  margin-top: 20px;
+  font-weight: 600;
+  color: #fff0f5;
 }
 </style>
 </head>
@@ -115,6 +120,7 @@ button:hover { transform: scale(1.05); }
 <div class="screen" id="screen3">
   <h2>You made a great choice</h2>
   <img id="gif" src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Celebration gif">
+  <div id="love">I love you</div>
 </div>
 
 <script>
@@ -124,30 +130,33 @@ function goTo(num) {
   document.getElementById('screen' + num).classList.add('active');
 }
 
-// Smooth NO button hover (~1 inch)
+// Track NO button position
 const noBtn = document.getElementById("noBtn");
+let noPos = { left: window.innerWidth - 80, top: 0 }; 
+noBtn.style.left = noPos.left + "px";
+noBtn.style.top = noPos.top + "px";
 
+// Smooth hover NO
 document.addEventListener("mousemove", e => {
   const screen2 = document.getElementById("screen2");
   if (!screen2.classList.contains("active")) return;
 
   const rect = noBtn.getBoundingClientRect();
-  const dx = e.clientX - (rect.left + rect.width / 2);
-  const dy = e.clientY - (rect.top + rect.height / 2);
+  const centerX = rect.left + rect.width/2;
+  const centerY = rect.top + rect.height/2;
+  const dx = e.clientX - centerX;
+  const dy = e.clientY - centerY;
   const distance = Math.sqrt(dx*dx + dy*dy);
 
   if (distance < 120) {
     const moveX = -dx / distance * 16;
     const moveY = -dy / distance * 16;
 
-    let newLeft = rect.left + moveX;
-    let newTop = rect.top + moveY;
+    noPos.left = Math.min(window.innerWidth - rect.width, Math.max(0, noPos.left + moveX));
+    noPos.top = Math.min(window.innerHeight - rect.height, Math.max(0, noPos.top + moveY));
 
-    newLeft = Math.min(window.innerWidth - rect.width, Math.max(0, newLeft));
-    newTop = Math.min(window.innerHeight - rect.height, Math.max(0, newTop));
-
-    noBtn.style.left = newLeft + "px";
-    noBtn.style.top = newTop + "px";
+    noBtn.style.left = noPos.left + "px";
+    noBtn.style.top = noPos.top + "px";
   }
 });
 
@@ -157,7 +166,7 @@ function startCelebration() {
   createHearts(70);
 }
 
-// Full-screen confetti
+// Confetti
 function createConfetti(count) {
   for (let i=0;i<count;i++){
     const c = document.createElement('div');
@@ -180,7 +189,7 @@ function createConfetti(count) {
   }
 }
 
-// Floating hearts
+// Hearts
 function createHearts(count){
   for (let i=0;i<count;i++){
     const h = document.createElement('div');
