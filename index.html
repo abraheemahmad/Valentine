@@ -30,11 +30,11 @@ button:hover { transform: scale(1.05); }
 
 .buttons {
   display:flex; justify-content:space-between;
-  width:320px; margin-top:10px; position:relative; height:60px; align-items:center;
+  width:180px; margin-top:10px; align-items:center;
 }
+
 .yes { background:white; color:#ff4d6d; font-weight:600; z-index:2; }
-.no { background:transparent; border:2px solid white; color:white;
-      position:absolute; z-index:2; transition:left 0.3s ease, top 0.3s ease; }
+.no { background:transparent; border:2px solid white; color:white; z-index:1; }
 
 #gif { width:90%; max-width:700px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.25); z-index:2; }
 #love { font-size:2.5rem; margin-top:20px; font-weight:600; color:#fff0f5; }
@@ -73,49 +73,6 @@ function goTo(num){
   document.getElementById('screen'+num).classList.add('active');
 }
 
-// NO button magnet movement
-const noBtn = document.getElementById("noBtn");
-const buttonsContainer = noBtn.parentElement;
-let noPos = { x: 0, y: 0 };
-let mouse = {x:0, y:0};
-
-document.addEventListener("mousemove", e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
-
-function resetNoButtonPosition(){
-  const rect = buttonsContainer.getBoundingClientRect();
-  noPos.x = rect.right - noBtn.offsetWidth;
-  noPos.y = rect.top + (rect.height - noBtn.offsetHeight)/2;
-  noBtn.style.left=noPos.x+"px";
-  noBtn.style.top=noPos.y+"px";
-}
-
-// Reset NO button each time we enter screen2
-document.getElementById("screen2").addEventListener("transitionend", resetNoButtonPosition);
-resetNoButtonPosition(); // initial
-
-function moveNoButton(){
-  const screen2 = document.getElementById("screen2");
-  if(screen2.classList.contains("active")){
-    const rect = noBtn.getBoundingClientRect();
-    const centerX = rect.left + rect.width/2;
-    const centerY = rect.top + rect.height/2;
-    const dx = mouse.x - centerX;
-    const dy = mouse.y - centerY;
-    const distance = Math.sqrt(dx*dx + dy*dy);
-    if(distance < 120){
-      noPos.x -= dx/distance*8;
-      noPos.y -= dy/distance*8;
-      // keep in viewport
-      noPos.x = Math.min(window.innerWidth - rect.width, Math.max(0,noPos.x));
-      noPos.y = Math.min(window.innerHeight - rect.height, Math.max(0,noPos.y));
-      noBtn.style.left = noPos.x+"px";
-      noBtn.style.top = noPos.y+"px";
-    }
-  }
-  requestAnimationFrame(moveNoButton);
-}
-requestAnimationFrame(moveNoButton);
-
 // Celebration
 function startCelebration(){
   createConfetti(200);
@@ -133,7 +90,7 @@ function createConfetti(count){
     document.body.appendChild(c);
     const fall=()=>{
       let top=parseFloat(c.style.top);
-      if(top>window.innerHeight+50){c.remove(); return;}
+      if(top>window.innerHeight+50){c.remove();return;}
       c.style.top=(top+5+Math.random()*3)+'px';
       c.style.left=(parseFloat(c.style.left)+Math.sin(top/20)*2)+'px';
       requestAnimationFrame(fall);
@@ -152,7 +109,7 @@ function createHearts(count){
     document.body.appendChild(h);
     const floatUp=()=>{
       let top=parseFloat(h.style.top);
-      if(top<-50){h.remove(); return;}
+      if(top<-50){h.remove();return;}
       h.style.top=(top-(1+Math.random()*2))+'px';
       h.style.left=(parseFloat(h.style.left)+Math.sin(top/50))+'px';
       requestAnimationFrame(floatUp);
